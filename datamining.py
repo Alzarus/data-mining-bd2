@@ -3,24 +3,28 @@ import psycopg2
 class DataMining(object):
     _db=None
     def __init__(self, mhost, db, usr, pwd):
-        self._db = psycopg2.connect(host=mhost, database=db, user=usr,  password=pwd)
+        try:
+            self._db = psycopg2.connect(host=mhost, database=db, user=usr,  password=pwd)
+
+        except:
+            return None
 
     def manipular(self, sql):
         try:
             cur=self._db.cursor()
             cur.execute(sql)
-            cur.close();
+            cur.close()
             self._db.commit()
         except:
-            return False;
-            return True;
+            return False
+            return True
 
     def consultar(self, sql):
         rs=None
         try:
             cur=self._db.cursor()
             cur.execute(sql)
-            rs=cur.fetchall();
+            rs=cur.fetchall()
             return rs
         except:
             return None
@@ -36,12 +40,12 @@ class DataMining(object):
         self._db.close()
 
 def main():
-    con=DataMining('localhost','DataMining','postgres','aluno')
+    con=DataMining('localhost','DataMining','postgres','admin')
     # sql = "insert into cidade values (default,'Rio de Janeiro','RJ')"
     # if con.manipular(sql):
     #   print('inserido com sucesso!')
     # print (con.proximaPK('cidade', 'id'))
-    rs=con.consultar("select * from transacao")
+    rs=con.consultar("select * from transacoes")
     for linha in rs:
       print (linha)
     con.fechar()
