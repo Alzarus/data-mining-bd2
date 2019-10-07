@@ -8,7 +8,7 @@ class Produto(object):
     def add(self, valor):
         self.transacoes.append(valor)
     
-    def switch(self, transacoes):
+    def trocar_transacoes(self, transacoes):
         self.transacoes = transacoes
 
 class DataMining(object):
@@ -90,17 +90,19 @@ def main():
             i+=1
 
     aux = []
-    prod_atual = 0
+    produto_atual = 0
     for produto in produtos:
-        index = prod_atual
+        index = produto_atual
+        
         for i in range(0, 10):
             aux.append(produto.transacoes[index])
             index += 7
-        produto.switch(aux)
+
+        produto.trocar_transacoes(aux)
         print('\n' + 'aquiiii' + str(aux))
         print(produto.transacoes)
         aux.clear()
-        prod_atual += 1
+        produto_atual += 1
 
     for produto in produtos:
         print('\n' + produto.nome + '   -   ' + str(produto.transacoes))
