@@ -43,17 +43,21 @@ feijao
 
 
 
-Suporte mínimo utilizado para a análise: 0.3
+Suporte mínimo utilizado para a análise: 0.2
 
-Confiança mínima utilizada para a análise: 0.4
+Confiança mínima utilizada para a análise: 0.3
 
 
 
 *******************REGRAS INTERESSANTES ENCONTRADAS*******************
+leite and pao
+leite and manteiga
 cafe and pao
 cafe and manteiga
+pao and leite
 pao and cafe
 pao and manteiga
+manteiga and leite
 manteiga and cafe
 manteiga and pao
 

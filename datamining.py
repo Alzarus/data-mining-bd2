@@ -1,12 +1,9 @@
 #!/usr/bin/python3
 import psycopg2
 
-data_mining = None
 produtos = []
 regras_interessantes = []
 arq = open('resultado.txt', 'w')
-minsup = None
-minconf = None
 
 
 class Produto(object):
