@@ -1,28 +1,41 @@
+#!/usr/bin/python3
 import psycopg2
+
+data_mining = None
+produtos = []
+regras_interessantes = []
+arq = open('resultado.txt', 'w')
+minsup = None
+minconf = None
+
 
 class Produto(object):
     transacoes = []
+
     def __init__(self, nome):
         self.nome = nome
 
     def add(self, valor):
         self.transacoes.append(valor)
-    
+
     def trocar_transacoes(self, transacoes):
         self.transacoes = transacoes
 
+
 class DataMining(object):
-    _db=None
+    _db = None
+
     def __init__(self, mhost, db, usr, pwd):
         try:
-            self._db = psycopg2.connect(host=mhost, database=db, user=usr,  password=pwd)
+            self._db = psycopg2.connect(
+                host=mhost, database=db, user=usr, password=pwd)
 
         except:
             return None
 
     def manipular(self, sql):
         try:
-            cur=self._db.cursor()
+            cur = self._db.cursor()
             cur.execute(sql)
             cur.close()
             self._db.commit()
@@ -31,20 +44,20 @@ class DataMining(object):
             return True
 
     def consultar(self, sql):
-        rs=None
+        rs = None
         try:
-            cur=self._db.cursor()
+            cur = self._db.cursor()
             cur.execute(sql)
-            rs=cur.fetchall()
+            rs = cur.fetchall()
             return rs
         except:
             return None
 
     def proximaPK(self, tabela, chave):
-        sql='select max('+chave+') from '+tabela
+        sql = 'select max(' + chave + ') from ' + tabela
         rs = self.consultar(sql)
         pk = rs[0][0]
-        return pk+1
+        return pk + 1
 
     def fechar(self):
         self._db.close()
@@ -58,92 +71,106 @@ class DataMining(object):
         lista_produtos.append(Produto('arroz'))
         lista_produtos.append(Produto('feijao'))
 
-    def calculo_suporte(self, produto_x, produto_y, total):
-        pass
 
-    def calculo_confianca(self, produto_x, produto_y):
-        pass
+def calculo_suporte(produto_x, produto_y):
+    total_transacoes = len(produto_x.transacoes)
+    qtd_x_and_y = 0
+
+    i = 0
+    while i < total_transacoes:
+        if produto_x.transacoes[i] == True and produto_y.transacoes[i] == True:
+            qtd_x_and_y += 1
+        i += 1
+    return float(qtd_x_and_y / total_transacoes)
 
 
+def calculo_confianca(produto_x, produto_y):
+    total_transacoes = len(produto_x.transacoes)
+    qtd_x_and_y = 0
+    qtd_x = 0
 
-def main():
-    produtos = []
-    data_mining = DataMining('localhost','DataMining','postgres','admin')
+    i = 0
+    while i < total_transacoes:
+        if produto_x.transacoes[i] == True and produto_y.transacoes[i] == True:
+            qtd_x_and_y += 1
+
+        if produto_x.transacoes[i] == True:
+            qtd_x += 1
+
+        i += 1
+
+    return float(qtd_x_and_y / qtd_x)
+
+
+def preparar_dados():
+    data_mining = DataMining('localhost', 'DataMining', 'postgres', 'admin')
     data_mining.criar_produtos(produtos)
 
     rs = data_mining.consultar("select * from transacoes")
 
-    # ESTRANHO NAO TER FUNCIONADO NESSE METODO ABAIXO:
-    # i = 0
-    # for linha in rs:
-    #     print(str(linha))
-    #     for coluna in linha:
-    #         produtos[i].add(coluna)
-        # i += 1
-
-    # ESTRANHO NAO TER FUNCIONADO NESSE METODO ABAIXO TAMBEM:
+    arq.writelines(
+        '\n\n************************DADOS EXTRAIDOS DO BANCO************************\n\n')
     for linha in rs:
-        print(str(linha))
+        arq.write(str(linha) + '\n')
         i = 1
         for produto in produtos:
             produto.add(linha[i])
-            i+=1
+            i += 1
+    arq.write(
+        '\n************************************************************************\n')
 
     aux = []
     produto_atual = 0
     for produto in produtos:
         index = produto_atual
-        
+
         for i in range(0, 10):
             aux.append(produto.transacoes[index])
             index += 7
 
         produto.trocar_transacoes(aux)
-        print('\n' + 'aquiiii' + str(aux))
-        print(produto.transacoes)
-        aux.clear()
+        aux = []
         produto_atual += 1
 
+    arq.write(
+        '\n\n********************PRODUTOS PREPARADOS DEVIDAMENTE*********************\n')
     for produto in produtos:
-        print('\n' + produto.nome + '   -   ' + str(produto.transacoes))
-        
-
-    ##################### EXTREME GOHORSE 1 ####################
-    # i = 1
-    # for produto in produtos:
-    #     for linha in rs:
-    #         produto.add(linha[i])
-    #     i+=1
-
-    # for produto in produtos:
-    #     produto._transacoes = produto._transacoes[0:10]
-
-    #################### EXTREME GOHORSE 2 ####################
-    # i = 0
-    # for produto in produtos:
-    #     for coluna in rs[i]:
-    #         produto.add(coluna)
-    #     i+=1
-
-    # x = 1
-    # y = 8
-    # for produto in produtos:
-    #     produto._transacoes = produto._transacoes[x:y]
-    #     x+=8
-    #     y+=8
-
-    ###########################################################
-
-    # suporte_min = float(input('Insira o valor de suporte mínimo: <Formato: 0.0>'))
-    # confianca_min = float(input('Insira o valor de confiança mínima: <Formato: 0.0>'))
-
-    # i = 0
-    # while i < len(produtos):
-    #     TODO: CONTINUAR...
-    #     i+=1
-    
+        arq.write('\n' + produto.nome + '\n' + str(produto.transacoes) + '\n')
+    arq.write(
+        '\n************************************************************************\n\n')
 
     data_mining.fechar()
+
+
+def analisar_dados():
+    minsup = float(
+        input('Insira o valor de suporte mínimo para análise: <Formato: 0.0>'))
+    minconf = float(
+        input('Insira o valor de confiança mínima para análise: <Formato: 0.0>'))
+
+    arq.write('\n\nSuporte mínimo utilizado para a análise: {}\n'.format(minsup))
+    arq.write('\nConfiança mínima utilizada para a análise: {}\n\n'.format(minconf))
+
+    for produto in produtos:
+        for produto2 in produtos:
+            if produto.nome != produto2.nome:
+                if calculo_suporte(produto, produto2) >= minsup and calculo_confianca(produto,
+                                                                                      produto2) >= minconf:
+                    regras_interessantes.append('{} and {}'.format(produto.nome, produto2.nome))
+
+    arq.write(
+        '\n\n*******************REGRAS INTERESSANTES ENCONTRADAS*******************\n')
+    for regra in regras_interessantes:
+        arq.write(regra + '\n')
+    arq.write(
+        '\n************************************************************************\n')
+
+
+def main():
+    preparar_dados()
+    analisar_dados()
+    arq.close()
+
 
 if __name__ == "__main__":
     main()

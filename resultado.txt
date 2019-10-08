@@ -1,0 +1,60 @@
+
+
+************************DADOS EXTRAIDOS DO BANCO************************
+
+(1, False, True, False, True, True, False, False)
+(2, True, False, True, True, True, False, False)
+(3, False, True, False, True, True, False, False)
+(4, True, True, False, True, True, False, False)
+(5, False, False, True, False, False, False, False)
+(6, False, False, False, False, True, False, False)
+(7, False, False, False, True, False, False, False)
+(8, False, False, False, False, False, False, True)
+(9, False, False, False, False, False, True, True)
+(10, False, False, False, False, False, True, False)
+
+************************************************************************
+
+
+********************PRODUTOS PREPARADOS DEVIDAMENTE*********************
+
+leite
+[False, True, False, True, False, False, False, False, False, False]
+
+cafe
+[True, False, True, True, False, False, False, False, False, False]
+
+cerveja
+[False, True, False, False, True, False, False, False, False, False]
+
+pao
+[True, True, True, True, False, False, True, False, False, False]
+
+manteiga
+[True, True, True, True, False, True, False, False, False, False]
+
+arroz
+[False, False, False, False, False, False, False, False, True, True]
+
+feijao
+[False, False, False, False, False, False, False, True, True, False]
+
+************************************************************************
+
+
+
+Suporte mínimo utilizado para a análise: 0.3
+
+Confiança mínima utilizada para a análise: 0.4
+
+
+
+*******************REGRAS INTERESSANTES ENCONTRADAS*******************
+cafe and pao
+cafe and manteiga
+pao and cafe
+pao and manteiga
+manteiga and cafe
+manteiga and pao
+
+************************************************************************
