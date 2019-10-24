@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 import psycopg2
+import pandas as pd
 
 produtos = []
 regras_interessantes = []
 arq = open('resultado.txt', 'w')
+data_frame = None
 
 
 class Produto(object):
@@ -103,6 +105,8 @@ def preparar_dados():
     data_mining = DataMining('localhost', 'DataMining', 'postgres', 'admin')
     data_mining.criar_produtos(produtos)
 
+    data_frame = pd.read_sql_query("select * from transacoes", data_mining._db)
+
     rs = data_mining.consultar("select * from transacoes")
 
     arq.writelines(
@@ -116,14 +120,19 @@ def preparar_dados():
     arq.write(
         '\n************************************************************************\n')
 
+    # linhas da tabela
+    qtd_transacoes = data_frame.shape[0]
+    # colunas da tabela
+    qtd_produtos = data_frame.shape[1] - 1
+    
     aux = []
     produto_atual = 0
     for produto in produtos:
         index = produto_atual
 
-        for i in range(0, 10):
+        for i in range(0, qtd_transacoes):
             aux.append(produto.transacoes[index])
-            index += 7
+            index += qtd_produtos
 
         produto.trocar_transacoes(aux)
         aux = []
@@ -141,19 +150,20 @@ def preparar_dados():
 
 def analisar_dados():
     minsup = float(
-        input('Insira o valor de suporte mínimo para análise: <Formato: 0.0>'))
+        input('Insira o valor de suporte minimo para analise: <Formato: 0.0>'))
     minconf = float(
-        input('Insira o valor de confiança mínima para análise: <Formato: 0.0>'))
+        input('Insira o valor de confianca minima para analise: <Formato: 0.0>'))
 
-    arq.write('\n\nSuporte mínimo utilizado para a análise: {}\n'.format(minsup))
-    arq.write('\nConfiança mínima utilizada para a análise: {}\n\n'.format(minconf))
+    arq.write('\n\nSuporte minimo utilizado para a analise: {}\n'.format(minsup))
+    arq.write('\nConfianca minima utilizada para a analise: {}\n\n'.format(minconf))
 
     for produto in produtos:
         for produto2 in produtos:
             if produto.nome != produto2.nome:
                 if calculo_suporte(produto, produto2) >= minsup and calculo_confianca(produto,
                                                                                       produto2) >= minconf:
-                    regras_interessantes.append('{} and {}'.format(produto.nome, produto2.nome))
+                    regras_interessantes.append('{} and {} - Suporte = {} / Confianca = {}'.format(
+                        produto.nome, produto2.nome, calculo_suporte(produto, produto2), calculo_confianca(produto, produto2)))
 
     arq.write(
         '\n\n*******************REGRAS INTERESSANTES ENCONTRADAS*******************\n')
@@ -161,6 +171,8 @@ def analisar_dados():
         arq.write(regra + '\n')
     arq.write(
         '\n************************************************************************\n')
+
+    print("\nArquivo salvo em ./resultado.txt")
 
 
 def main():
