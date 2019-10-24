@@ -105,9 +105,13 @@ def preparar_dados():
     data_mining = DataMining('localhost', 'DataMining', 'postgres', 'admin')
     data_mining.criar_produtos(produtos)
 
-    data_frame = pd.read_sql_query("select * from transacoes", data_mining._db)
+    consulta_tabela = "select * from transacoes"
+    
+    rs = data_mining.consultar(consulta_tabela)
 
-    rs = data_mining.consultar("select * from transacoes")
+    # Lib PANDAS para analizar a tabela em si
+    data_frame = pd.read_sql_query(consulta_tabela, data_mining._db)
+
 
     arq.writelines(
         '\n\n************************DADOS EXTRAIDOS DO BANCO************************\n\n')
