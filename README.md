@@ -5,7 +5,7 @@ Rodar dependências:
 
     pip install -r requirements.txt
 
-Validar qual é a senha de conexão com o banco antes de inicializar o script:
+Validar qual é a senha de conexão com o banco (POSTGRES) antes de inicializar o script:
 
 Primeira linha após "def preparar_dados()":
 
