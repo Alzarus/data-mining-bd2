@@ -14,11 +14,11 @@ Primeira linha após "def preparar_dados()":
 
 Rodar o script:
 
-python datamining.py
+    python datamining.py
 
 
 Links de apoio:
 
-https://www.idiotinside.com/2015/05/10/python-auto-generate-requirements-txt/
+    https://www.idiotinside.com/2015/05/10/python-auto-generate-requirements-txt/
 
-https://note.nkmk.me/en/python-pandas-len-shape-size/
+    https://note.nkmk.me/en/python-pandas-len-shape-size/
